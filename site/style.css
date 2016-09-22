@@ -1,0 +1,151 @@
+body {
+    width: 980px;
+    margin: 0 ;
+}
+.top{
+  display: inline-block;
+}
+.logo {
+  margin-left: 15px;
+  margin-top: 10px;
+  width: 200px;
+  height: 100px;
+}
+.phone {
+  position: absolute;
+  left: 430px;
+  top: 20px;
+  font-size: 20px;
+}
+.login {
+  position: absolute;
+  left: 790px;
+  top: 30px;
+}
+.login a {
+  padding-left: 10px;
+  text-decoration: none;
+}
+.banner {
+  border: 1px dashed red;
+  background: url("banner.png") no-repeat 0 0;
+  width: 980px;
+  height: 150px;
+}
+.basket {
+  display: inline-block;
+  width: 80 px;
+  height:20px;
+  margin-left: 30px;
+  padding: 5px;
+  text-align: center;
+  background-color: #c2c2c2;
+  border: 3px solid #c2c2c2;
+  border-radius: 14px;
+}
+.main-part {
+  display:block;
+  width: 980px;
+  margin:0;
+  padding: 0;
+  height: auto;
+}
+  .left-menu {
+    display: inline-block;
+}
+.left-menu ul{
+  float: left;
+  list-style: none;
+  padding-left: 15px;
+}
+
+.left-menu-header,
+.left-menu a{
+  display: block;
+  height: 75px;
+  width: 300px;
+  border: 1px solid #dedede;
+  text-align: center;
+  padding-top: 45px;
+  font-size: 26px;
+  vertical-align: middle;
+}
+.search {
+  position: absolute;
+
+  float:left;
+  margin: 15px 15px  0;
+  display: inline-block;
+}
+.search input {
+  width: 635px;
+  border-radius: 10px;
+  border: 1px solid #bfbfbf;
+}
+.temp {
+  display: inline-block;
+  float: right;
+  margin-top: 50px;
+  margin-right: 15px;
+  width: 635px;
+  height: 460px;
+  padding: 0;
+}
+.temp img{display: inline-block;
+  float: left;
+  padding-left:10px;
+  height: 90%;
+  padding-top: 5px;
+}
+.temp ul
+{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.temp li {
+  border: 1px solid #dedede;
+  width: auto;
+  height: 153px;
+  margin-bottom: -1px;
+}
+.temp span{
+  display: inline-block;
+  float: left;
+  margin-top: 52px;
+  font-size: 25px;
+}
+.temp input{
+  display: inline-block;
+  float: right;
+  margin-top:60px;
+  margin-right: 15px;
+}
+
+.temp .price{
+  margin-right: 40px;
+  font-size: 32px;
+  display: inline-block;
+  float:right;
+}
+.fields {
+  display: block;
+  margin-right: 350px;
+  margin-top: 60px;
+
+}
+.main-part h1 {
+  text-align: center;
+}
+.main-part p {
+  text-align: center;
+  color: gray;
+}
+.fields input{
+  float: right;
+}
+
+.fields span{
+  float:right;
+  margin-right: 40px;
+}
