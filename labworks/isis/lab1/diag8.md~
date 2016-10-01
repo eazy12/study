@@ -104,7 +104,11 @@
 		    (object Dependency_Relationship
 			quid       	"57D8EF370314"
 			supplier   	"Use Case View::Диагностика терминала"
-			quidu      	"57D8ED0200CB")))
+			quidu      	"57D8ED0200CB")
+		    (object Dependency_Relationship
+			quid       	"57EB56A7012A"
+			supplier   	"Use Case View::Контроль активности сим карты"
+			quidu      	"57EB56570368")))
 	    (object Class "Техник, обслуживающий терминал"
 		quid       	"57D8ECEA02B5"
 		documentation 	"Квалифицированный специалист, обученный для обслуживания и диагностики просблем, возникающих при работе терминала."
@@ -117,7 +121,13 @@
 			quidu      	"57D8ED0200CB")))
 	    (object UseCase "Пополнение счёта"
 		quid       	"57D8ECE70192"
-		documentation 	"Пополнение лицевого счёта пользователя")
+		documentation 	"Пополнение лицевого счёта пользователя"
+		visible_modules 	(list dependency_list
+		    (object Dependency_Relationship
+			quid       	"57EB569003E2"
+			stereotype 	"extend"
+			supplier   	"Use Case View::Контроль активности сим карты"
+			quidu      	"57EB56570368")))
 	    (object UseCase "Диагностика терминала"
 		quid       	"57D8ED0200CB"
 		documentation 	
@@ -135,7 +145,7 @@
 			quid       	"57D8EFB401D9"
 			documentation 	"Пополнение расходного материала терминала ( бумага для печати чеков, купюры для сдачи)"
 			stereotype 	"extend"
-			supplier   	"Use Case View::Пополнение расходного материала"
+			supplier   	"Use Case View::Пополнение расходного материала и изъятие денег"
 			quidu      	"57D8ED180394")))
 	    (object UseCase "Проверка баланса"
 		quid       	"57D8ED10018F"
@@ -143,9 +153,9 @@
 |Проверка количества денег на лицевом счёте
 |
 		)
-	    (object UseCase "Пополнение расходного материала"
+	    (object UseCase "Пополнение расходного материала и изъятие денег"
 		quid       	"57D8ED180394"
-		documentation 	"Пополнение расходного материала терминала ( бумага для печати чеков, купюры для сдачи)"
+		documentation 	"Пополнение расходного материала терминала ( бумага для печати чеков, купюры для сдачи) и изъятие денег"
 		visible_modules 	(list dependency_list
 		    (object Dependency_Relationship
 			quid       	"57D8EF74004C"
@@ -154,10 +164,19 @@
 			quidu      	"57D8ED2C01C0")))
 	    (object UseCase "Получение диагностической информации"
 		quid       	"57D8ED2C01C0"
-		documentation 	"Получение диагностической информации. Доступ к этой информации есть только у техника. Информация включает в себя список последних пользователь, операций и запись с камеры видеонаблюдления"
+		documentation 	"Получение диагностической информации. Доступ к этой информации есть только у техника. Информация включает в себя список последних пользователь, операций и запись с камеры видеонаблюдления. Запись производится на эту специальную карту."
 		visible_modules 	(list dependency_list
 		    (object Dependency_Relationship
 			quid       	"57D8EF79037C"
+			stereotype 	"include"
+			supplier   	"Use Case View::Пополнение счёта"
+			quidu      	"57D8ECE70192")))
+	    (object UseCase "Контроль активности сим карты"
+		quid       	"57EB56570368"
+		documentation 	"Проверка активности симкарты."
+		visible_modules 	(list dependency_list
+		    (object Dependency_Relationship
+			quid       	"57EB56AC0058"
 			stereotype 	"include"
 			supplier   	"Use Case View::Пополнение счёта"
 			quidu      	"57D8ECE70192"))))
@@ -236,7 +255,7 @@
 			ShowCompartmentStereotypes 	TRUE
 			IncludeAttribute 	TRUE
 			IncludeOperation 	TRUE
-			location   	(608, 1264)
+			location   	(496, 1296)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -249,10 +268,10 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@2
-			    location   	(608, 1424)
+			    location   	(496, 1456)
 			    anchor_loc 	1
 			    nlines     	2
-			    max_width  	478
+			    max_width  	475
 			    justify    	0
 			    label      	"Техник, обслуживающий терминал")
 			icon       	"Actor"
@@ -262,7 +281,7 @@
 			annotation 	8
 			autoResize 	TRUE)
 		    (object UseCaseView "Use Case View::Диагностика терминала" @3
-			location   	(1200, 1312)
+			location   	(1232, 1456)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -275,7 +294,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@3
-			    location   	(1200, 1450)
+			    location   	(1232, 1594)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -309,7 +328,7 @@
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"57D8ED2C01C0")
-		    (object UseCaseView "Use Case View::Пополнение расходного материала" @5
+		    (object UseCaseView "Use Case View::Пополнение расходного материала и изъятие денег" @5
 			location   	(2096, 1584)
 			font       	(object Font
 			    size       	10
@@ -328,13 +347,13 @@
 			    nlines     	2
 			    max_width  	630
 			    justify    	0
-			    label      	"Пополнение расходного материала")
+			    label      	"Пополнение расходного материала и изъятие денег")
 			icon_style 	"Icon"
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"57D8ED180394")
-		    (object UseCaseView "Use Case View::Проверка баланса" @6
-			location   	(1728, 208)
+		    (object UseCaseView "Use Case View::Пополнение счёта" @6
+			location   	(2400, 560)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -347,31 +366,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@6
-			    location   	(1728, 346)
-			    anchor_loc 	1
-			    nlines     	2
-			    max_width  	630
-			    justify    	0
-			    label      	"Проверка баланса")
-			icon_style 	"Icon"
-			line_color 	3342489
-			fill_color 	13434879
-			quidu      	"57D8ED10018F")
-		    (object UseCaseView "Use Case View::Пополнение счёта" @7
-			location   	(1744, 672)
-			font       	(object Font
-			    size       	10
-			    face       	"Arial"
-			    charSet    	204
-			    bold       	FALSE
-			    italics    	FALSE
-			    underline  	FALSE
-			    strike     	FALSE
-			    color      	0
-			    default_color 	TRUE)
-			label      	(object ItemLabel
-			    Parent_View 	@7
-			    location   	(1744, 810)
+			    location   	(2400, 698)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -381,37 +376,17 @@
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"57D8ECE70192")
-		    (object DependencyView "" @8
-			stereotype 	TRUE
-			line_color 	3342489
-			quidu      	"57D8EEE001B0"
-			client     	@1
-			supplier   	@6
-			vertices   	(list Points
-			    (649, 540)
-			    (1618, 238))
-			line_style 	0)
-		    (object DependencyView "" @9
-			stereotype 	TRUE
-			line_color 	3342489
-			quidu      	"57D8EF220310"
-			client     	@1
-			supplier   	@7
-			vertices   	(list Points
-			    (649, 563)
-			    (1632, 658))
-			line_style 	0)
-		    (object DependencyView "" @10
+		    (object DependencyView "" @7
 			stereotype 	TRUE
 			line_color 	3342489
 			quidu      	"57D8EFA5018E"
 			client     	@2
 			supplier   	@3
 			vertices   	(list Points
-			    (665, 1267)
-			    (1090, 1298))
+			    (553, 1306)
+			    (1120, 1429))
 			line_style 	0)
-		    (object DependencyView "" @11
+		    (object DependencyView "" @8
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -422,9 +397,9 @@
 			    strike     	FALSE
 			    color      	0
 			    default_color 	TRUE)
-			stereotype 	(object SegLabel @12
-			    Parent_View 	@11
-			    location   	(1575, 1157)
+			stereotype 	(object SegLabel @9
+			    Parent_View 	@8
+			    location   	(1472, 1254)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -441,18 +416,18 @@
 			    max_width  	450
 			    justify    	0
 			    label      	"<<include>>"
-			    pctDist    	0.437316
-			    height     	80
+			    pctDist    	0.379280
+			    height     	107
 			    orientation 	0)
 			line_color 	3342489
 			quidu      	"57D8EFAE0244"
 			client     	@3
 			supplier   	@4
 			vertices   	(list Points
-			    (1308, 1288)
-			    (1952, 1168))
+			    (1340, 1415)
+			    (1785, 1251))
 			line_style 	0)
-		    (object DependencyView "" @13
+		    (object DependencyView "" @10
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -463,9 +438,9 @@
 			    strike     	FALSE
 			    color      	0
 			    default_color 	TRUE)
-			stereotype 	(object SegLabel @14
-			    Parent_View 	@13
-			    location   	(1647, 1541)
+			stereotype 	(object SegLabel @11
+			    Parent_View 	@10
+			    location   	(1682, 1591)
 			    font       	(object Font
 				size       	10
 				face       	"Arial"
@@ -482,16 +457,91 @@
 			    max_width  	450
 			    justify    	0
 			    label      	"<<extend>>"
-			    pctDist    	0.442317
-			    height     	91
+			    pctDist    	0.546872
+			    height     	70
 			    orientation 	1)
 			line_color 	3342489
 			quidu      	"57D8EFB401D9"
 			client     	@3
 			supplier   	@5
 			vertices   	(list Points
-			    (1426, 1378)
-			    (1986, 1550))
+			    (1340, 1470)
+			    (1984, 1565))
+			line_style 	0)
+		    (object UseCaseView "Use Case View::Контроль активности сим карты" @12
+			location   	(1408, 576)
+			font       	(object Font
+			    size       	10
+			    face       	"Arial"
+			    charSet    	204
+			    bold       	FALSE
+			    italics    	FALSE
+			    underline  	FALSE
+			    strike     	FALSE
+			    color      	0
+			    default_color 	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@12
+			    location   	(1408, 714)
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	630
+			    justify    	0
+			    label      	"Контроль активности сим карты")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"57EB56570368")
+		    (object DependencyView "" @13
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"57EB56A7012A"
+			client     	@1
+			supplier   	@12
+			vertices   	(list Points
+			    (649, 560)
+			    (1296, 571))
+			line_style 	0)
+		    (object DependencyView "" @14
+			font       	(object Font
+			    size       	10
+			    face       	"Arial"
+			    charSet    	204
+			    bold       	FALSE
+			    italics    	FALSE
+			    underline  	FALSE
+			    strike     	FALSE
+			    color      	0
+			    default_color 	TRUE)
+			stereotype 	(object SegLabel @15
+			    Parent_View 	@14
+			    location   	(1901, 447)
+			    font       	(object Font
+				size       	10
+				face       	"Arial"
+				charSet    	204
+				bold       	FALSE
+				italics    	FALSE
+				underline  	FALSE
+				strike     	FALSE
+				color      	0
+				default_color 	TRUE)
+			    anchor     	10
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	450
+			    justify    	0
+			    label      	"<<include>>"
+			    pctDist    	0.500000
+			    height     	120
+			    orientation 	0)
+			line_color 	3342489
+			quidu      	"57EB56AC0058"
+			client     	@12
+			supplier   	@6
+			vertices   	(list Points
+			    (1516, 572)
+			    (2288, 559))
 			line_style 	0)))
 	    (object ClassDiagram "Legend"
 		quid       	"39CD51840059"
@@ -502,7 +552,7 @@
 		origin_x   	0
 		origin_y   	0
 		items      	(list diagram_item_list
-		    (object NoteView @15
+		    (object NoteView @16
 			location   	(224, 624)
 			font       	(object Font
 			    size       	10
@@ -518,7 +568,7 @@
 			fill_color 	12632256
 			width      	300
 			height     	132)
-		    (object NoteView @16
+		    (object NoteView @17
 			location   	(704, 624)
 			font       	(object Font
 			    size       	10
@@ -534,7 +584,7 @@
 			fill_color 	8421631
 			width      	300
 			height     	132)
-		    (object NoteView @17
+		    (object NoteView @18
 			location   	(1200, 624)
 			font       	(object Font
 			    size       	10
@@ -550,7 +600,7 @@
 			fill_color 	12615680
 			width      	300
 			height     	132)
-		    (object NoteView @18
+		    (object NoteView @19
 			location   	(1664, 624)
 			font       	(object Font
 			    size       	10
@@ -566,7 +616,7 @@
 			fill_color 	16777215
 			width      	300
 			height     	132)
-		    (object Label @19
+		    (object Label @20
 			location   	(81, 369)
 			font       	(object Font
 			    size       	12
@@ -582,7 +632,7 @@
 			max_width  	1163
 			justify    	1
 			label      	"J2EE: Java 2 Platform, Enterprise Edition - v 1.2.1")
-		    (object Label @20
+		    (object Label @21
 			location   	(96, 608)
 			font       	(object Font
 			    size       	10
@@ -598,7 +648,7 @@
 			max_width  	268
 			justify    	1
 			label      	"Abstract Class")
-		    (object Label @21
+		    (object Label @22
 			location   	(592, 608)
 			font       	(object Font
 			    size       	10
@@ -614,7 +664,7 @@
 			max_width  	225
 			justify    	1
 			label      	"Final Class")
-		    (object Label @22
+		    (object Label @23
 			location   	(1104, 608)
 			font       	(object Font
 			    size       	10
@@ -630,7 +680,7 @@
 			max_width  	206
 			justify    	1
 			label      	"Interface")
-		    (object Label @23
+		    (object Label @24
 			location   	(1552, 608)
 			font       	(object Font
 			    size       	10
