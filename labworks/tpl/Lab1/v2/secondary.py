@@ -1,3 +1,4 @@
+#todo: вывод слова - тип слова
 from tkinter import *
 from enum import Enum
 class LA:
@@ -11,10 +12,12 @@ class LA:
 		self.where = ""
 		self.oldWhere = ""
 		self.endStatus = False
+		self.endSymbol=""
 		self.obligatory = False
 		self.entryString = ""
 		self.errorStatus = ""
 		self.b = False
+		self.slovo = ""
 		self.i = 0
 		self.isItCommentary = False
 		self.text1=Text(self.root,height=20,width=self.textWidth,font='Mono 14',wrap=WORD)
@@ -37,13 +40,15 @@ class LA:
 			self.entryString = ""
 		if( self.strr == ""):
 			self.strr = self.text1.get(1.0, END)
+			self.endSymbol=self.strr[-1]
+			if(self.endSymbol == "\n"):
+				print("LUL")
 			self.strr = self.strr[0:-1]
 		while(self.strr[self.i]):
 			if( self.errorStatus == "error"):
 				break
 			elif self.isEntryFull == True:
 				print("entryfull cahnged")
-				print(self.where)
 				self.isEntryFull = False
 				break
 			elif (self.endStatus == False):
@@ -56,6 +61,7 @@ class LA:
 						self.A_letter()
 					elif (self.strr[self.i] == " "):
 						print("Space")
+						self.i+=1
 						continue
 					elif (self.strr[self.i] == "/"):
 						self.where = "Commentary2"
@@ -113,7 +119,7 @@ class LA:
 			return
 		else:
 			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
+			self.entry1.insert(1 , "Недопустимый символ+")
 			self.errorStatus = "error"
 			return
 		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
@@ -132,6 +138,8 @@ class LA:
 			self.errorStatus = "error"
 			return
 		if (self.strr[self.i] == "0"):
+			self.slovo += self.strr[self.i]
+			self.slovoType = type1
 			self.i+=1
 			self.where = "B_digit()"
 			return
@@ -169,10 +177,14 @@ class LA:
 			self.errorStatus = "error"
 			return
 		elif (self.strr[self.i] == "0"):
+			self.slovo += self.strr[self.i]
+			self.slovoType = type
 			self.i+=1
 			self.where = "C_digit()"
 			return
 		elif (self.strr[self.i] == "1"):
+			self.slovo += self.strr[self.i]
+			self.slovoType = type
 			self.i+=1
 			self.where = "D_digit()"
 			return
@@ -209,6 +221,8 @@ class LA:
 			self.errorStatus = "error"
 			return
 		elif (self.strr[self.i] == "0"):
+			self.slovo += self.strr[self.i]
+			self.slovoType = type
 			self.i+=1
 			self.where = "A_digit()"
 			return
@@ -259,9 +273,16 @@ class LA:
 			self.i+=1
 			return
 		elif (self.strr[self.i] == "0" and self.strr[self.i+1]=="0"):
+			self.slovo += self.strr[self.i]
+			self.slovoType = type
 			self.i+=1
 			self.where = "E_digit()"
 			return
+		elif (self.strr[self.i] == "0"):
+			self.slovo += self.strr[self.i]
+			self.slovoType = type
+			self.i+=1
+			self.where = "E_digit()"
 
 	def E_digit(self):
 		print("in E_digit()")
@@ -271,6 +292,12 @@ class LA:
 			self.where = "Commentary2"
 			self.i+=1
 			self.oldWhere = "E_digit()"
+			return
+		elif self.strr[self.i] == '\n':
+			print("4Head")
+			self.i+=1
+			self.condition="start"
+			self.obligatory =False
 			return
 		else:
 			print("Lexical error: E_digit")
@@ -325,10 +352,16 @@ class LA:
 		if (self.strr[self.i] == "1"):
 			self.i+=1
 			self.where = "G_digit()"
+		elif (self.strr[self.i] == "0"):
+			print("Lexical error: F_digit")
+			self.entry1.delete(0, END)
+			self.entry1.insert(1 , "Лексическая ошибка")
+			self.errorStatus = "error"
 			return
 
 	def G_digit(self):
 		space = False
+		endline = False
 		print("in G_digit()", self.strr[self.i])
 		if (self.strr[self.i] in "01"):
 			type1 = " цифра "
@@ -370,7 +403,12 @@ class LA:
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
 			return
-		if(space == True):
+		if(self.strr[self.i+1] == "\n"):
+			self.strr = self.strr[0:(self.i+1)] +' '+ self.strr[(self.i+2):] 
+		if(endline == True):
+			self.i+=1
+			self.condition = "start"
+		elif(space == True):
 			self.i+=1
 			self.condition = "start"
 		elif (self.strr[self.i+1] == " " and self.strr[self.i]=="1"):
@@ -390,6 +428,10 @@ class LA:
 			self.where = "Commentary2"
 			self.i+=1
 			self.oldWhere = "A_letter()"
+			return
+		elif self.strr[self.i] == '\n':
+			self.i+=1
+			self.condition="start"
 			return
 		elif self.strr[self.i] ==' ':
 			type1 = " пробел "
@@ -438,6 +480,10 @@ class LA:
 			self.where = "Commentary2"
 			self.oldWhere = "B_letter()"
 			self.i+=1
+			return
+		elif self.strr[self.i] == '\n':
+			self.i+=1
+			self.condition="start"
 			return
 		elif self.strr[self.i] ==' ':
 			type1 = " пробел "
