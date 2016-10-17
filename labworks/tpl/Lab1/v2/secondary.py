@@ -1,4 +1,5 @@
 #todo: вывод слова - тип слова
+
 from tkinter import *
 from enum import Enum
 class LA:
@@ -29,26 +30,26 @@ class LA:
 		self.root.rowconfigure(0, weight=1)
 		self.root.columnconfigure(0, weight=1)
 	def lex_anal(self):
-		if(self.endStatus == True):
-			self.entry1.delete(0, END)
-			print("entry deleted")
-			self.endStatus = False
-			self.condition = "start"
-			self.strr = ""
-			self.where = ""
-			self.i = 0
-			self.entryString = ""
+		# if(self.endStatus == True):
+		# 	self.entry1.delete(0, END)
+		# 	print("entry deleted")
+		# 	self.endStatus = False
+		# 	self.condition = "start"
+		# 	self.strr = ""
+		# 	self.where = ""
+		# 	self.i = 0
+		# 	self.entryString = ""
 		if( self.strr == ""):
 			self.strr = self.text1.get(1.0, END)
 			self.endSymbol=self.strr[-1]
 			if(self.endSymbol == "\n"):
 				print("LUL")
 			self.strr = self.strr[0:-1]
-		while(self.strr[self.i]):
+		while(self.i < len(self.strr)):
 			if( self.errorStatus == "error"):
 				break
 			elif self.isEntryFull == True:
-				print("entryfull cahnged")
+				print("entryfull changed")
 				self.isEntryFull = False
 				break
 			elif (self.endStatus == False):
@@ -58,9 +59,16 @@ class LA:
 						self.where = "A_digit()"
 						self.A_digit()
 					elif (self.strr[self.i] in "abcd"):
+						self.where = "A_letter()"
 						self.A_letter()
 					elif (self.strr[self.i] == " "):
+						self.condition = "start"
 						print("Space")
+						self.i+=1
+						continue
+					elif (self.strr[self.i] == "\n"):
+						self.condition = "start"
+						print("EndLine")
 						self.i+=1
 						continue
 					elif (self.strr[self.i] == "/"):
@@ -90,7 +98,7 @@ class LA:
 						self.A_letter()
 					elif self.where =="B_letter()":
 						self.B_letter()
-					elif self.where == "Commentary2": 
+					elif self.where == "Commentary2":
 						if( (self.i + 1) == len(self.strr)):
 							self.endStatus = True
 						while(self.strr[self.i]!="/"):
@@ -111,7 +119,7 @@ class LA:
 	def A_digit(self):
 		print("in A_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.oldWhere = "A_digit()"
@@ -119,18 +127,10 @@ class LA:
 			return
 		else:
 			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ+")
+			self.entry1.insert(1 , "Недопустимый символ")
 			self.errorStatus = "error"
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.where = "A_digit()"
-			self.entryString = ""
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
 			self.entry1.delete(0, END)
@@ -138,8 +138,6 @@ class LA:
 			self.errorStatus = "error"
 			return
 		if (self.strr[self.i] == "0"):
-			self.slovo += self.strr[self.i]
-			self.slovoType = type1
 			self.i+=1
 			self.where = "B_digit()"
 			return
@@ -147,7 +145,7 @@ class LA:
 	def B_digit(self):
 		print("in B_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.oldWhere = "B_digit()"
@@ -161,15 +159,7 @@ class LA:
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "B_digit()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if (self.strr[self.i] == "1" and self.strr[self.i+1] =="1" ):
 			print("Lexical error: B_digit There is no self.obligatory part of word")
 			self.entry1.delete(0, END)
@@ -177,14 +167,10 @@ class LA:
 			self.errorStatus = "error"
 			return
 		elif (self.strr[self.i] == "0"):
-			self.slovo += self.strr[self.i]
-			self.slovoType = type
 			self.i+=1
 			self.where = "C_digit()"
 			return
 		elif (self.strr[self.i] == "1"):
-			self.slovo += self.strr[self.i]
-			self.slovoType = type
 			self.i+=1
 			self.where = "D_digit()"
 			return
@@ -192,7 +178,7 @@ class LA:
 	def C_digit(self):
 		print("in C_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.i+=1
@@ -204,15 +190,7 @@ class LA:
 			self.entry1.insert(1 , "Недопустимый символ")
 			self.errorStatus = "error"
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "C_digit()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
 			print("Lexical error: C_digit. Short word")
 			self.entry1.delete(0, END)
@@ -221,8 +199,6 @@ class LA:
 			self.errorStatus = "error"
 			return
 		elif (self.strr[self.i] == "0"):
-			self.slovo += self.strr[self.i]
-			self.slovoType = type
 			self.i+=1
 			self.where = "A_digit()"
 			return
@@ -230,53 +206,32 @@ class LA:
 	def D_digit(self):
 		print("in D_digit()")
 		self.obligatory = True
-		space = False
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.i+=1
 			self.oldWhere = "D_digit()"
 			return
-		elif self.strr[self.i] ==' ':
-			type1 = " пробел "
-			space = True
 		else:
 			print("Lexical error: D_digit")
 			self.entry1.delete(0, END)
 			self.entry1.insert(1 , "Недопустимый символ")
 			self.errorStatus = "error"
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if (len(self.entryString + tempString) <= self.entryWidth and (self.i + 1) == len(self.strr)):
-			self.entryString += tempString
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.endStatus = True
-			return
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "D_digit()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
+			self.obligatory = False
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
 			return
-		elif( space == True):
-			self.i+=1
+		elif (self.strr[self.i] == "0" and (self.strr[self.i+1]==" " or self.strr[self.i+1]=="\n" )):
 			self.condition = "start"
-			return
-		elif (self.strr[self.i] == "0" and self.strr[self.i+1]==" "):
+			self.obligatory = False
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
 			self.i+=1
-			return
-		elif (self.strr[self.i] == "0" and self.strr[self.i+1]=="0"):
-			self.slovo += self.strr[self.i]
-			self.slovoType = type
-			self.i+=1
-			self.where = "E_digit()"
 			return
 		elif (self.strr[self.i] == "0"):
 			self.slovo += self.strr[self.i]
@@ -287,14 +242,13 @@ class LA:
 	def E_digit(self):
 		print("in E_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.i+=1
 			self.oldWhere = "E_digit()"
 			return
 		elif self.strr[self.i] == '\n':
-			print("4Head")
 			self.i+=1
 			self.condition="start"
 			self.obligatory =False
@@ -308,15 +262,7 @@ class LA:
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "E_digit()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if (self.strr[self.i] == "0"):
 			self.i+=1
 			self.where = "F_digit()"
@@ -325,7 +271,7 @@ class LA:
 	def F_digit(self):
 		print("in F_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.i+=1
@@ -340,15 +286,7 @@ class LA:
 		if (self.i + 1) == len(self.strr) :
 			self.endStatus = True
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "F_digit()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if (self.strr[self.i] == "1"):
 			self.i+=1
 			self.where = "G_digit()"
@@ -360,19 +298,14 @@ class LA:
 			return
 
 	def G_digit(self):
-		space = False
-		endline = False
 		print("in G_digit()", self.strr[self.i])
 		if (self.strr[self.i] in "01"):
-			type1 = " цифра "
+			type1 = " цифры "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.i+=1
 			self.oldWhere = "G_digit()"
 			return
-		elif self.strr[self.i] ==' ':
-			type1 = " пробел "
-			space = True
 		else:
 			print("Lexical error: G_digit")
 			self.entry1.delete(0, END)
@@ -385,33 +318,18 @@ class LA:
 			self.entry1.insert(1 , "Лексическая ошибка")
 			self.errorStatus = "error"
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if (len(self.entryString + tempString) <= self.entryWidth and (self.i + 1) == len(self.strr)):
-			self.entryString += tempString
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.endStatus = True
-			return
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "G_digit()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
 			self.endStatus = True
 			return
 		if(self.strr[self.i+1] == "\n"):
-			self.strr = self.strr[0:(self.i+1)] +' '+ self.strr[(self.i+2):] 
-		if(endline == True):
-			self.i+=1
-			self.condition = "start"
-		elif(space == True):
-			self.i+=1
-			self.condition = "start"
+			self.strr = self.strr[0:(self.i+1)] +' '+ self.strr[(self.i+2):]
 		elif (self.strr[self.i+1] == " " and self.strr[self.i]=="1"):
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
+			self.condition = "start"
 			self.i+=1
 			return
 		elif (self.strr[self.i+1] == "0" and self.strr[self.i]=="1"):
@@ -421,48 +339,39 @@ class LA:
 
 	def A_letter(self):
 		print("in A_letter()")
-		space = False
 		if (self.strr[self.i] in "abcd"):
-			type1 = " буква "
+			type1 = " буквы "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.i+=1
 			self.oldWhere = "A_letter()"
 			return
-		elif self.strr[self.i] == '\n':
+		elif self.strr[self.i] == ' ':
 			self.i+=1
 			self.condition="start"
+		elif self.strr[self.i] == '\n':
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + " ")
+			self.entryString = ""
+			self.condition = "start"
+			self.i+=1
 			return
-		elif self.strr[self.i] ==' ':
-			type1 = " пробел "
-			space = True
 		else:
 			self.entry1.delete(0, END)
 			self.entry1.insert(1 , "Недопустимый символ")
 			self.errorStatus = "error"
 			return
-		print("1")
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if (len(self.entryString + tempString) <= self.entryWidth and (self.i + 1) == len(self.strr)):
-			self.entryString += tempString
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.endStatus = True
-			return
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "A_letter()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
 			self.endStatus = True
 			return
-		if(space == True):
-			self.i+=1
+		elif( self.strr[self.i+1] == " "):
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
 			self.condition = "start"
+			self.i+=1
+			return
 		elif (self.strr[self.i] in "acd"):
 			self.i+=1
 			self.where = "A_letter()"
@@ -472,22 +381,23 @@ class LA:
 			self.where = "B_letter()"
 
 	def B_letter(self):
-		space = False
 		print("in B_letter()")
 		if (self.strr[self.i] in "abcd"):
-			type1 = " буква "
+			type1 = " буквы "
 		elif self.strr[self.i] =='/':
 			self.where = "Commentary2"
 			self.oldWhere = "B_letter()"
 			self.i+=1
 			return
-		elif self.strr[self.i] == '\n':
+		elif self.strr[self.i] == ' ':
 			self.i+=1
 			self.condition="start"
+		elif self.strr[self.i] == '\n':
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + " буквы ")
+			self.entryString = ""
+			self.condition = "start"
+			self.i+=1
 			return
-		elif self.strr[self.i] ==' ':
-			type1 = " пробел "
-			space = True
 		else:
 			self.entry1.delete(0, END)
 			self.entry1.insert(1 ,"Ошибка: Недопустимый символ")
@@ -499,29 +409,19 @@ class LA:
 			print("Lexical error: B_letter()")
 			self.errorStatus = "error"
 			return
-		tempString = self.strr[self.i] + type1 + str(ord(self.strr[self.i])) + ' '
-		if (len(self.entryString + tempString) <= self.entryWidth and (self.i + 1) == len(self.strr)):
-			self.entryString += tempString
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.endStatus = True
-			return
-		if( len(self.entryString + tempString) > self.entryWidth):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , self.entryString)
-			self.entryString = ""
-			self.where = "B_letter()"
-			self.isEntryFull = True
-			return
-		self.entryString += tempString
+		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
 			self.endStatus = True
 			return
-		if (self.strr[self.i] in "acd"):
+		elif self.strr[self.i+1] == ' ':
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entryString = ""
+			self.condition = "start"
+			self.i+=1
+			return
+		elif (self.strr[self.i] in "acd"):
 			self.i+=1
 			self.where = "A_letter()"
 			return
-		elif space == True:
-			self.i+=1
-			self.condition = "start"
-
