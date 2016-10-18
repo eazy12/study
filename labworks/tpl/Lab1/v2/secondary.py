@@ -20,6 +20,7 @@ class LA:
 		self.b = False
 		self.slovo = ""
 		self.i = 0
+		self.type1 = ""
 		self.isItCommentary = False
 		self.text1=Text(self.root,height=20,width=self.textWidth,font='Mono 14',wrap=WORD)
 		self.entry1=Entry(self.root,width=self.entryWidth,font='Mono 14')
@@ -30,32 +31,27 @@ class LA:
 		self.root.rowconfigure(0, weight=1)
 		self.root.columnconfigure(0, weight=1)
 	def lex_anal(self):
-		# if(self.endStatus == True):
-		# 	self.entry1.delete(0, END)
-		# 	print("entry deleted")
-		# 	self.endStatus = False
-		# 	self.condition = "start"
-		# 	self.strr = ""
-		# 	self.where = ""
-		# 	self.i = 0
-		# 	self.entryString = ""
 		if( self.strr == ""):
-			self.strr = self.text1.get(1.0, END)
-			self.endSymbol=self.strr[-1]
-			if(self.endSymbol == "\n"):
-				print("LUL")
-			self.strr = self.strr[0:-1]
+			com = False
+			for j, value in enumerate(self.text1.get(1.0, END)):
+				if value == "/" and com == True:
+					com = False
+					continue
+				elif value == "/" and com == False:
+					com = True
+					continue
+				elif com == True:
+					continue
+				elif value == "\n":
+					self.strr += " "
+					continue
+				self.strr += value
+			print(self.strr)
 		while(self.i < len(self.strr)):
-			if( self.errorStatus == "error"):
-				break
-			elif self.isEntryFull == True:
-				print("entryfull changed")
-				self.isEntryFull = False
-				break
-			elif (self.endStatus == False):
+			if (self.endStatus == False):
 				if (self.condition == "start"):
 					self.condition = "continue"
-					if (self.strr[self.i]=="0"):
+					if (self.strr[self.i] in "01"):
 						self.where = "A_digit()"
 						self.A_digit()
 					elif (self.strr[self.i] in "abcd"):
@@ -66,17 +62,9 @@ class LA:
 						print("Space")
 						self.i+=1
 						continue
-					elif (self.strr[self.i] == "\n"):
-						self.condition = "start"
-						print("EndLine")
-						self.i+=1
-						continue
-					elif (self.strr[self.i] == "/"):
-						self.where = "Commentary2"
-						self.oldWhere = "Commentary2"
-						self.i=+1
 					else:
 						print("Error in begin")
+						self.skip("error")
 				else:
 					if self.where == "A_digit()":
 						self.A_digit()
@@ -98,279 +86,219 @@ class LA:
 						self.A_letter()
 					elif self.where =="B_letter()":
 						self.B_letter()
-					elif self.where == "Commentary2":
-						if( (self.i + 1) == len(self.strr)):
-							self.endStatus = True
-						while(self.strr[self.i]!="/"):
-							print("*")
-							if( (self.i + 1) == len(self.strr)):
-								self.endStatus = True
-							self.i+=1
-						else:
-							self.i+=1
-							if(self.oldWhere == "Commentary2"):
-								self.condition="start"
-							if(self.oldWhere!=""):
-								self.where = self.oldWhere
 			elif (self.endStatus == True):
 				print("End")
 				break
 
+	def skip(self, instr):
+		print("Johny?")
+		if(instr == "error"):
+			self.entry1.insert(len(self.entry1.get()) , self.entryString)
+			for j in self.strr[self.i:]:
+				if self.strr[self.i] == " ":
+					self.entry1.insert(len(self.entry1.get()) ," Ошибка ")
+					self.i+=1
+					self.entryString =""
+					self.condition = "start"
+					break
+				self.i+=1
+				self.entry1.insert(len(self.entry1.get()) , self.strr[self.i])
+
 	def A_digit(self):
 		print("in A_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.oldWhere = "A_digit()"
-			self.i+=1
-			return
+			self.type1 = " цифры "
 		else:
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
+			self.skip("error")
+			self.entryString =""
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Короткое слово")
-			self.errorStatus = "error"
+			self.skip("error")
+			self.entryString = ""
 			return
 		if (self.strr[self.i] == "0"):
 			self.i+=1
 			self.where = "B_digit()"
-			return
+		else:
+			print("Lexical error: A_digit")
+			self.skip("error")
+			self.entryString = ""
 
 	def B_digit(self):
 		print("in B_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.oldWhere = "B_digit()"
-			self.i+=1
-			return
+			self.type1 = " цифры "
 		else:
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
-			return
-		if( (self.i + 1) == len(self.strr)):
-			self.endStatus = True
+			self.skip("error")
 			return
 		self.entryString += self.strr[self.i]
+		if( (self.i + 1) == len(self.strr)):
+			self.endStatus = True
+			self.skip("error")
+			self.entryString = ""
+			return
 		if (self.strr[self.i] == "1" and self.strr[self.i+1] =="1" ):
 			print("Lexical error: B_digit There is no self.obligatory part of word")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Нет обязательной части")
-			self.errorStatus = "error"
-			return
+			print(self.entryString)
+			self.skip("error")
+			self.entryString = ""
 		elif (self.strr[self.i] == "0"):
 			self.i+=1
 			self.where = "C_digit()"
-			return
 		elif (self.strr[self.i] == "1"):
 			self.i+=1
 			self.where = "D_digit()"
-			return
+		else:
+			print("Lexical error: B_digit")
+			self.skip("error")
+			self.entryString = ""
 
 	def C_digit(self):
 		print("in C_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.i+=1
-			self.oldWhere = "C_digit()"
-			return
+			self.type1 = " цифры "
 		else:
 			print("Lexical error: C_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
+			self.skip("error")
+			self.entryString = ""
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
 			print("Lexical error: C_digit. Short word")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Короткое слово")
+			self.skip("error")
 			self.endStatus = True
-			self.errorStatus = "error"
-			return
+			self.entryString = ""
 		elif (self.strr[self.i] == "0"):
 			self.i+=1
 			self.where = "A_digit()"
-			return
+		else:
+			print("Lexical error: C_digit")
+			self.skip("error")
+			self.entryString = ""
 
 	def D_digit(self):
 		print("in D_digit()")
 		self.obligatory = True
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.i+=1
-			self.oldWhere = "D_digit()"
-			return
+			self.type1 = " цифры "
 		else:
 			print("Lexical error: D_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
+			self.skip("error")
+			self.entryString = ""
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
 			self.obligatory = False
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
-			return
-		elif (self.strr[self.i] == "0" and (self.strr[self.i+1]==" " or self.strr[self.i+1]=="\n" )):
-			self.condition = "start"
-			self.obligatory = False
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
-			self.entryString = ""
-			self.i+=1
-			return
 		elif (self.strr[self.i] == "0"):
-			self.slovo += self.strr[self.i]
-			self.slovoType = type
 			self.i+=1
 			self.where = "E_digit()"
+		else:
+			print("Lexical error: D_digit")
+			self.skip("error")
+			self.entryString = ""
 
 	def E_digit(self):
 		print("in E_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.i+=1
-			self.oldWhere = "E_digit()"
-			return
-		elif self.strr[self.i] == '\n':
+			self.type1 = " цифры "
+		elif self.strr[self.i] == ' ':
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.i+=1
 			self.condition="start"
-			self.obligatory =False
+			self.obligatory = False
+			self.entryString =""
 			return
 		else:
 			print("Lexical error: E_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый сивол")
-			self.errorStatus = "error"
-			return
-		if( (self.i + 1) == len(self.strr)):
-			self.endStatus = True
+			self.skip("error")
 			return
 		self.entryString += self.strr[self.i]
+		if( (self.i + 1) == len(self.strr)):
+			self.endStatus = True
+			self.skip("error")
+			return
+		if self.obligatory == False:
+			print("Lexical error: E_digit")
+			self.skip("error")
+			self.entryString = ""
 		if (self.strr[self.i] == "0"):
 			self.i+=1
 			self.where = "F_digit()"
-			return
+		else:
+			print("Lexical error: E_digit")
+			self.skip("error")
+			self.entryString = ""
 
 	def F_digit(self):
 		print("in F_digit()")
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.i+=1
-			self.oldWhere = "F_digit()"
-			return
+			self.type1 = " цифры "
 		else:
 			print("Lexical error: F_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
-			return
-		if (self.i + 1) == len(self.strr) :
-			self.endStatus = True
+			self.skip("error")
+			self.entryString = ""
 			return
 		self.entryString += self.strr[self.i]
+		if (self.i + 1) == len(self.strr) :
+			self.endStatus = True
+			self.skip("error")
+			self.entryString = ""
+			return
 		if (self.strr[self.i] == "1"):
 			self.i+=1
 			self.where = "G_digit()"
-		elif (self.strr[self.i] == "0"):
+		else:
 			print("Lexical error: F_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Лексическая ошибка")
-			self.errorStatus = "error"
-			return
+			self.skip("error")
+			self.entryString = ""
+
 
 	def G_digit(self):
 		print("in G_digit()", self.strr[self.i])
 		if (self.strr[self.i] in "01"):
-			type1 = " цифры "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.i+=1
-			self.oldWhere = "G_digit()"
-			return
+			self.type1 = " цифры "
 		else:
 			print("Lexical error: G_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
-			return
-		if(self.strr[self.i]=="0" ):
-			print("Lexical error: G_digit")
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Лексическая ошибка")
-			self.errorStatus = "error"
+			self.skip("error")
+			self.entryString = ""
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.endStatus = True
-			return
-		if(self.strr[self.i+1] == "\n"):
-			self.strr = self.strr[0:(self.i+1)] +' '+ self.strr[(self.i+2):]
-		elif (self.strr[self.i+1] == " " and self.strr[self.i]=="1"):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
-			self.entryString = ""
-			self.condition = "start"
-			self.i+=1
-			return
-		elif (self.strr[self.i+1] == "0" and self.strr[self.i]=="1"):
+		elif (self.strr[self.i]=="1"):
 			self.i+=1
 			self.where = "E_digit()"
-			return
+		else:
+			print("Lexical error: G_digit")
+			self.skip("error")
+			self.entryString = ""
 
 	def A_letter(self):
 		print("in A_letter()")
 		if (self.strr[self.i] in "abcd"):
-			type1 = " буквы "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.i+=1
-			self.oldWhere = "A_letter()"
-			return
+			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
 			self.i+=1
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + "буквы")
 			self.condition="start"
-		elif self.strr[self.i] == '\n':
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + " ")
-			self.entryString = ""
-			self.condition = "start"
-			self.i+=1
+			self.entryString =""
 			return
 		else:
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Недопустимый символ")
-			self.errorStatus = "error"
+			print("Lexical error: A_letter")
+			self.skip("error")
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.endStatus = True
-			return
-		elif( self.strr[self.i+1] == " "):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
-			self.entryString = ""
-			self.condition = "start"
-			self.i+=1
 			return
 		elif (self.strr[self.i] in "acd"):
 			self.i+=1
@@ -379,44 +307,36 @@ class LA:
 		elif (self.strr[self.i] == "b"):
 			self.i+=1
 			self.where = "B_letter()"
+		else:
+			print("Lexical error: A_letter")
+			self.skip("error")
 
 	def B_letter(self):
 		print("in B_letter()")
 		if (self.strr[self.i] in "abcd"):
-			type1 = " буквы "
-		elif self.strr[self.i] =='/':
-			self.where = "Commentary2"
-			self.oldWhere = "B_letter()"
-			self.i+=1
-			return
+			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + "буквы")
 			self.i+=1
 			self.condition="start"
-		elif self.strr[self.i] == '\n':
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + " буквы ")
-			self.entryString = ""
-			self.condition = "start"
-			self.i+=1
+			self.entryString =""
 			return
 		else:
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 ,"Ошибка: Недопустимый символ")
-			self.errorStatus = "error"
-			return
-		if (self.strr[self.i] == "b"):
-			self.entry1.delete(0, END)
-			self.entry1.insert(1 , "Ошибка: Два b подряд")
-			print("Lexical error: B_letter()")
-			self.errorStatus = "error"
+			print("Lexical error: B_letter")
+			self.skip("error")
 			return
 		self.entryString += self.strr[self.i]
+		if (self.strr[self.i] == "b"):
+			print("Lexical error: B_letter")
+			self.skip("error")
+			return
 		if( (self.i + 1) == len(self.strr)):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.endStatus = True
 			return
 		elif self.strr[self.i+1] == ' ':
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + type1)
+			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.condition = "start"
 			self.i+=1
