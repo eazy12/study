@@ -1,5 +1,3 @@
-#todo: вывод слова - тип слова
-
 from tkinter import *
 from enum import Enum
 class LA:
@@ -31,22 +29,23 @@ class LA:
 		self.root.rowconfigure(0, weight=1)
 		self.root.columnconfigure(0, weight=1)
 	def lex_anal(self):
-		if( self.strr == ""):
-			com = False
-			for j, value in enumerate(self.text1.get(1.0, END)):
-				if value == "/" and com == True:
-					com = False
-					continue
-				elif value == "/" and com == False:
-					com = True
-					continue
-				elif com == True:
-					continue
-				elif value == "\n":
-					self.strr += " "
-					continue
-				self.strr += value
-			print(self.strr)
+		# if( self.strr == ""):
+		self.entry1.delete(0, END)
+		com = False
+		for j, value in enumerate(self.text1.get(1.0, END)):
+			if value == "/" and com == True:
+				com = False
+				continue
+			elif value == "/" and com == False:
+				com = True
+				continue
+			elif com == True:
+				continue
+			elif value == "\n":
+				self.strr += " "
+				continue
+			self.strr += value
+		print(self.strr)
 		while(self.i < len(self.strr)):
 			if (self.endStatus == False):
 				if (self.condition == "start"):
