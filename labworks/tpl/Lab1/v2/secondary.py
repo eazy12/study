@@ -27,6 +27,9 @@ class LA:
 	def set_ui(self,x):
 		self.uiclass = x
 	def lex_anal(self):
+		self.i = 0
+		self.strr=""
+		print(self.i)
 		self.uiclass.entry1.delete(0, END)
 		com = False
 		for j, value in enumerate(self.uiclass.text1.get(1.0, END)):
@@ -83,12 +86,17 @@ class LA:
 						self.B_letter()
 			elif (self.endStatus == True):
 				print("End")
+				self.endStatus = False
+				self.condition = "start"
+				self.strr=""
+				self.entryString = ""
 				break
 
 	def skip(self, instr):
 		if(instr == "error"):
 			self.uiclass.entry1.insert(0 , "Ошибка")
 			self.entryString = ""
+			self.endStatus = True
 			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString)
 			#for j in self.strr[self.i:]:
 			#	if self.strr[self.i] == " ":
