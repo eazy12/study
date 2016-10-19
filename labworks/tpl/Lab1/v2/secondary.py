@@ -29,7 +29,6 @@ class LA:
 	def lex_anal(self):
 		self.i = 0
 		self.strr=""
-		print(self.i)
 		self.uiclass.entry1.delete(0, END)
 		com = False
 		for j, value in enumerate(self.uiclass.text1.get(1.0, END)):
@@ -45,7 +44,6 @@ class LA:
 				self.strr += " "
 				continue
 			self.strr += value
-		print(self.strr)
 		while(self.i < len(self.strr)):
 			if (self.endStatus == False):
 				if (self.condition == "start"):
@@ -263,7 +261,7 @@ class LA:
 
 
 	def G_digit(self):
-		print("in G_digit()", self.strr[self.i])
+		print("in G_digit()")
 		if (self.strr[self.i] in "01"):
 			self.type1 = " цифры "
 		else:
