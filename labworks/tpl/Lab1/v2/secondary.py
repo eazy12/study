@@ -1,11 +1,21 @@
 from tkinter import *
 from enum import Enum
-
-class LA:
-	def __init__(self):
+class UI:
+	def __init__(self,x):
 		self.textWidth = 20
 		self.entryWidth = 45
 		self.root=Tk()
+		self.x = x
+		self.text1=Text(self.root,height=20,width=self.textWidth,font='Mono 14',wrap=WORD)
+		self.entry1=Entry(self.root,width=self.entryWidth,font='Mono 14')
+		self.button1=Button(self.root,text="Start",command=self.x.lex_anal )
+		self.text1.grid(row=0,column=0,rowspan=3)
+		self.entry1.grid(row=0,column=1,padx=5)
+		self.button1.grid(row=0,column=2)
+		self.root.rowconfigure(0, weight=1)
+		self.root.columnconfigure(0, weight=1)
+class LA:
+	def __init__(self):		
 		self.strr = ""
 		self.condition = "start"
 		self.where = ""
@@ -14,18 +24,12 @@ class LA:
 		self.entryString = ""
 		self.i = 0
 		self.type1 = ""
-		self.text1=Text(self.root,height=20,width=self.textWidth,font='Mono 14',wrap=WORD)
-		self.entry1=Entry(self.root,width=self.entryWidth,font='Mono 14')
-		self.button1=Button(self.root,text="Start",command=self.lex_anal )
-		self.text1.grid(row=0,column=0,rowspan=3)
-		self.entry1.grid(row=0,column=1,padx=5)
-		self.button1.grid(row=0,column=2)
-		self.root.rowconfigure(0, weight=1)
-		self.root.columnconfigure(0, weight=1)
+	def set_ui(self,x):
+		self.uiclass = x
 	def lex_anal(self):
-		self.entry1.delete(0, END)
+		self.uiclass.entry1.delete(0, END)
 		com = False
-		for j, value in enumerate(self.text1.get(1.0, END)):
+		for j, value in enumerate(self.uiclass.text1.get(1.0, END)):
 			if value == "/" and com == True:
 				com = False
 				continue
@@ -83,16 +87,16 @@ class LA:
 
 	def skip(self, instr):
 		if(instr == "error"):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString)
 			for j in self.strr[self.i:]:
 				if self.strr[self.i] == " ":
-					self.entry1.insert(len(self.entry1.get()) ," Ошибка ")
+					self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) ," Ошибка ")
 					self.i+=1
 					self.entryString =""
 					self.condition = "start"
 					break
 				self.i+=1
-				self.entry1.insert(len(self.entry1.get()) , self.strr[self.i])
+				self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.strr[self.i])
 
 	def A_digit(self):
 		print("in A_digit()")
@@ -182,7 +186,7 @@ class LA:
 		if( (self.i + 1) == len(self.strr)):
 			self.endStatus = True
 			self.obligatory = False
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 		elif (self.strr[self.i] == "0"):
 			self.i+=1
@@ -197,7 +201,7 @@ class LA:
 		if (self.strr[self.i] in "01"):
 			self.type1 = " цифры "
 		elif self.strr[self.i] == ' ':
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.i+=1
 			self.condition="start"
 			self.obligatory = False
@@ -259,7 +263,7 @@ class LA:
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.endStatus = True
 		elif (self.strr[self.i]=="1"):
@@ -276,7 +280,7 @@ class LA:
 			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
 			self.i+=1
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + " буквы ")
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
 			self.condition="start"
 			self.entryString =""
 			return
@@ -286,7 +290,7 @@ class LA:
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.endStatus = True
 			return
@@ -306,7 +310,7 @@ class LA:
 		if (self.strr[self.i] in "abcd"):
 			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + " буквы ")
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
 			self.i+=1
 			self.condition="start"
 			self.entryString =""
@@ -321,12 +325,12 @@ class LA:
 			self.skip("error")
 			return
 		if( (self.i + 1) == len(self.strr)):
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.endStatus = True
 			return
 		elif self.strr[self.i+1] == ' ':
-			self.entry1.insert(len(self.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.entryString = ""
 			self.condition = "start"
 			self.i+=1
