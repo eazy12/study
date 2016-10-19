@@ -87,16 +87,18 @@ class LA:
 
 	def skip(self, instr):
 		if(instr == "error"):
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString)
-			for j in self.strr[self.i:]:
-				if self.strr[self.i] == " ":
-					self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) ," Ошибка ")
-					self.i+=1
-					self.entryString =""
-					self.condition = "start"
-					break
-				self.i+=1
-				self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.strr[self.i])
+			self.uiclass.entry1.insert(0 , "Ошибка")
+			self.entryString = ""
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString)
+			#for j in self.strr[self.i:]:
+			#	if self.strr[self.i] == " ":
+			#		self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) ," Ошибка ")
+			#		self.i+=1
+			#		self.entryString =""
+			#		self.condition = "start"
+			#		break
+			#	self.i+=1
+			#	self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.strr[self.i])
 
 	def A_digit(self):
 		print("in A_digit()")
