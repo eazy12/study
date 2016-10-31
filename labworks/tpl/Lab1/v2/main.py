@@ -1,3 +1,6 @@
 from secondary import LA
+from secondary import UI
 la = LA()
-la.root.mainloop()
+ui = UI(la)
+la.set_ui(ui)
+ui.root.mainloop()
