@@ -8,18 +8,21 @@ class UI:
 		self.x = x
 		self.text1=Text(self.root,height=20,width=self.textWidth,font='Mono 14',wrap=WORD)
 		self.text2=Text(self.root,height=20,width=self.textWidth,font='Mono 14',wrap=WORD)
+		self.text3=Text(self.root,height=10,width=self.textWidth,font='Mono 14',wrap=WORD)
 		self.entry1=Entry(self.root,width=self.entryWidth,font='Mono 14')
 		self.button1=Button(self.root,text="Start",command=self.x.lex_anal )
 		self.text1.grid(row=0,column=0,rowspan=3)
 		self.text2.grid(row=0,column=1,rowspan=3)
-		self.entry1.grid(row=0,column=2,padx=5)
-		self.button1.grid(row=0,column=3)
+		self.text3.grid(row=2,column=1,rowspan=3)
+		self.entry1.grid(row=1,column=2,padx=5)
+		self.button1.grid(row=1,column=3)
 		self.root.rowconfigure(0, weight=1)
 		self.root.columnconfigure(0, weight=1)
 class LA:
 	def __init__(self):
 		self.strr = ""
 		self.a = []
+		self.b = []
 		self.condition = "start"
 		self.where = ""
 		self.endStatus = False
@@ -30,10 +33,6 @@ class LA:
 	def set_ui(self,x):
 		self.uiclass = x
 	def lex_anal(self):
-		print(self.a)
-		kappa = self.uiclass.text2.get(1.0, END)
-		self.uiclass.text2.insert( END, self.a)
-		self.uiclass.text2.insert( END, ' ')
 		self.i = 0
 		self.strr=""
 		self.uiclass.entry1.delete(0, END)
@@ -41,9 +40,13 @@ class LA:
 		for j, value in enumerate(self.uiclass.text1.get(1.0, END)):
 			if value == "/" and com == True:
 				com = False
+				if self.b.count(value)==0:
+					self.b.append(value)
 				continue
 			elif value == "/" and com == False:
 				com = True
+				if self.b.count(value)==0:
+					self.b.append(value)
 				continue
 			elif com == True:
 				continue
@@ -51,6 +54,8 @@ class LA:
 				self.strr += " "
 				continue
 			self.strr += value
+		self.uiclass.text3.delete( 1.0, END)
+		self.uiclass.text3.insert( 1.0, self.b)
 		while(self.i < len(self.strr)):
 			if (self.endStatus == False):
 				if (self.condition == "start"):
@@ -65,6 +70,14 @@ class LA:
 						self.condition = "start"
 						print("Space")
 						self.i+=1
+						continue
+					elif self.strr[self.i] in "!@#№$:;<>?+=-_()*&^%":
+						if self.b.count(self.strr[self.i])==0:
+							self.b.append(self.strr[self.i])
+						self.uiclass.text3.delete( 1.0, END)
+						self.uiclass.text3.insert( 1.0, self.b)
+						self.i+=1
+						self.condition = "start"
 						continue
 					else:
 						print("Error in begin")
@@ -204,6 +217,8 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.endStatus = True
 			self.entryString = ""
 		elif (self.strr[self.i] == "0"):
@@ -225,6 +240,8 @@ class LA:
 			self.obligatory = False
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.entryString =""
 			return
 		else:
@@ -286,9 +303,10 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.endStatus = True
 			self.entryString = ""
-			self.endStatus = True
 		elif (self.strr[self.i]=="1"):
 			self.i+=1
 			self.where = "E_digit()"
@@ -306,6 +324,8 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.condition="start"
 			self.entryString =""
 			return
@@ -318,6 +338,8 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.entryString = ""
 			self.endStatus = True
 			return
@@ -340,6 +362,8 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.i+=1
 			self.condition="start"
 			self.entryString =""
@@ -357,6 +381,8 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.entryString = ""
 			self.endStatus = True
 			return
@@ -364,6 +390,8 @@ class LA:
 			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.a.count(self.entryString)==0:
 				self.a.append(self.entryString)
+			self.uiclass.text2.delete( 1.0, END)
+			self.uiclass.text2.insert( 1.0, self.a)
 			self.entryString = ""
 			self.condition = "start"
 			self.i+=1
