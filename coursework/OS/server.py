@@ -3,7 +3,8 @@ import random
 import os
 import sys
 import subprocess
-
+import time
+b = False
 questions = [
     ["Дата создания с++","1950","1960","1970","1980"],
     ["Дата создания java","1950","1960","1970","1980"],
@@ -16,7 +17,7 @@ f = open('pyt.py', 'w')
 random.shuffle(questions)
 
 sock = socket.socket()
-sock.bind(('', 9090))
+sock.bind(('', 9091))
 sock.listen(1)
 conn, addr = sock.accept()
 try:
@@ -26,11 +27,14 @@ try:
     i=0
     if data.decode('utf-8') == "Готов":
         while(i<5):
-            conn.send(bytes(questions[i][0],encoding = 'utf-8'))
+            #conn.send(bytes(questions[i][0],encoding = 'utf-8'))
+            for k in range(0,5):
+                conn.send(bytes(questions[i][k],encoding = 'utf-8'))
+                time.sleep(0.3)
             answer = conn.recv(1024)
+            answer = answer.decode('utf-8')
             print(answer)
-            if answer :
-                i+=1
+            i=i+1
         else:
             conn.send(bytes("LUL",encoding = 'utf-8'))
             program = conn.recv(1024)
@@ -38,18 +42,24 @@ try:
             f.write(program+"\n")
             f.close()
             process = subprocess.check_output("python3 pyt.py", shell=True)
-            print("1")
             print(process)
-            print("2")
-            #conn.send(bytes(process,encoding = 'utf-8'))
+            conn.send(bytes(process, encoding = 'utf-8'))
             conn.send(process)
     else:
         pass
+    if b == False:
+        conn.close()
+        b = True
 except KeyboardInterrupt:
     print("Error ctrl+с")
-    conn.close()
-except:
-    conn.close()
-finally:
-    pass
+    if b == False:
+        conn.close()
+        b = True
+#except:
+    #print("except block")
+    #conn.close()
     #os.system("rm pyt.py")
+finally:
+    if b == False:
+        conn.close()
+        b = True
