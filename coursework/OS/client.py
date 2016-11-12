@@ -2,7 +2,7 @@ import socket
 import time
 
 sock = socket.socket()
-sock.connect(('localhost', 9091))
+sock.connect(('localhost', 9080))
 print("Введите Готов для начала контрольной работы")
 try:
     s = input()
@@ -42,7 +42,7 @@ try:
     result = result.decode('utf-8')
     print("************ Результат выполнения программы ************")
     print(result, end = "\n")
-    #print("************ Результат выполнения программы ************")
+    print("************ Результат выполнения программы ************")
     print("Тест закончен")
 except KeyboardInterrupt:
     print("Error ctrl+z")

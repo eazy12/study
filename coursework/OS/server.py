@@ -3,6 +3,7 @@ import random
 import os
 import sys
 import subprocess
+import traceback
 import time
 b = False
 questions = [
@@ -17,7 +18,7 @@ f = open('pyt.py', 'w')
 random.shuffle(questions)
 
 sock = socket.socket()
-sock.bind(('', 9091))
+sock.bind(('', 9080))
 sock.listen(1)
 conn, addr = sock.accept()
 try:
@@ -26,7 +27,7 @@ try:
     data = conn.recv(1024)
     i=0
     if data.decode('utf-8') == "Готов":
-        while(i<5):
+        while(i<1):
             #conn.send(bytes(questions[i][0],encoding = 'utf-8'))
             for k in range(0,5):
                 conn.send(bytes(questions[i][k],encoding = 'utf-8'))
@@ -39,11 +40,11 @@ try:
             conn.send(bytes("LUL",encoding = 'utf-8'))
             program = conn.recv(1024)
             program = program.decode('utf-8')
-            f.write(program+"\n")
+            f.write(program)
             f.close()
-            process = subprocess.check_output("python3 pyt.py", shell=True)
+            process = subprocess.check_output("python3 pyt.py", stderr = subprocess.STDOUT, shell=True)
             print(process)
-            conn.send(bytes(process, encoding = 'utf-8'))
+            #conn.send(bytes(process, encoding = 'utf-8'))
             conn.send(process)
     else:
         pass
@@ -55,10 +56,20 @@ except KeyboardInterrupt:
     if b == False:
         conn.close()
         b = True
-#except:
-    #print("except block")
-    #conn.close()
-    #os.system("rm pyt.py")
+except subprocess.CalledProcessError as err:
+    print(err.output)
+    conn.send(err.output)
+    if b == False:
+        conn.close()
+        b = True
+    #print(err.cmd)
+    #print(sys.stderr)
+except:
+    print("except block")
+    if b == False:
+        conn.close()
+        b = True
+    os.system("rm pyt.py")
 finally:
     if b == False:
         conn.close()
