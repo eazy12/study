@@ -1,5 +1,6 @@
 from tkinter import *
 from enum import Enum
+
 class UI:
 	def __init__(self,x):
 		self.textWidth = 20
@@ -11,7 +12,7 @@ class UI:
 		self.text3=Text(self.root,height=8,width=self.textWidth,font='Mono 14',wrap=WORD)
 		self.text4=Text(self.root,height=8,width=self.textWidth,font='Mono 14',wrap=WORD)
 		self.entry1=Entry(self.root,width=self.entryWidth,font='Mono 14')
-		self.button1=Button(self.root,text="Start",command=self.x.lex_anal )
+		self.button1=Button(self.root,text="Start",command=self.x.SA )
 		self.text1.grid(row=0,column=0,rowspan=3)
 		self.text2.grid(row=0,column=1)
 		self.text3.grid(row=1,column=1)
@@ -22,12 +23,14 @@ class UI:
 		self.root.columnconfigure(0, weight=1)
 class LA:
 	def __init__(self):
+		self.isLastWord = False
 		self.strr = ""
 		self.numbers = []
 		self.sysSymbols = []
 		self.words = []
 		self.condition = "start"
 		self.where = ""
+		self.SAwhere = ""
 		self.endStatus = False
 		self.obligatory = False
 		self.entryString = ""
@@ -42,7 +45,7 @@ class LA:
 		self.uiclass.text2.delete(1.0,END)
 		self.uiclass.text3.delete(1.0,END)
 		self.uiclass.text4.delete(1.0,END)
-		self.i = 0
+		#self.i = 0
 		self.strr=""
 		self.uiclass.entry1.delete(0, END)
 		com = False
@@ -65,6 +68,8 @@ class LA:
 				self.strr += " "
 				continue
 			self.strr += value
+		#self.strr = self.strr[:-1]
+		print(self.strr)
 		while(self.i < len(self.strr)):
 			if (self.endStatus == False):
 				if (self.condition == "start"):
@@ -80,13 +85,17 @@ class LA:
 						print("Space")
 						self.i+=1
 						continue
-					elif self.strr[self.i] in "!@#№$:;<>?+=-_()*&^%":
+					elif self.strr[self.i] in "[]":
 						if self.sysSymbols.count(self.strr[self.i])==0:
 							self.sysSymbols.append(self.strr[self.i])
 						self.uiclass.text3.insert( END, self.sysSymbols[-1]+" ")
-						self.i+=1
+						print("End")
+						self.endStatus = False
 						self.condition = "start"
-						continue
+						self.strr=""
+						self.entryString = ""
+						print(self.strr[self.i], self.strr[self.i] , self.isLastWord)
+						return self.strr[self.i], self.strr[self.i] , self.isLastWord
 					else:
 						print("Error in begin")
 						self.entryString += self.strr[self.i]
@@ -110,29 +119,28 @@ class LA:
 						self.A_letter()
 					elif self.where =="B_letter()":
 						self.B_letter()
+			elif self.isLastWord == True:
+				print("End")
+				self.endStatus = False
+				self.condition = "start"
+				self.strr=""
+				self.entryString = ""
+				print(self.entryString, self.type1, self.isLastWord)
+				return self.entryString, self.type1, self.isLastWord
 			elif (self.endStatus == True):
 				print("End")
 				self.endStatus = False
 				self.condition = "start"
 				self.strr=""
 				self.entryString = ""
-				break
+				print(self.entryString, self.type1, self.isLastWord)
+				return self.entryString, self.type1, self.isLastWord
 
 	def skip(self, instr):
 		if(instr == "error"):
 			self.uiclass.entry1.insert(0 , "Ошибка")
 			self.entryString = ""
 			self.endStatus = True
-			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString)
-			#for j in self.strr[self.i:]:
-			#	if self.strr[self.i] == " ":
-			#		self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) ," Ошибка ")
-			#		self.i+=1
-			#		self.entryString =""
-			#		self.condition = "start"
-			#		break
-			#	self.i+=1
-			#	self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.strr[self.i])
 
 	def A_digit(self):
 		print("in A_digit()")
@@ -220,13 +228,12 @@ class LA:
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.endStatus = True
+			self.isLastWord = True
 			self.obligatory = False
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.numbers.count(self.entryString)==0:
 				self.numbers.append(self.entryString)
 				self.uiclass.text2.insert( END, self.numbers[-1]+" ")
-			self.endStatus = True
 			self.entryString = ""
 		elif (self.strr[self.i] == "0"):
 			self.i+=1
@@ -241,9 +248,10 @@ class LA:
 		if (self.strr[self.i] in "01"):
 			self.type1 = " цифры "
 		elif self.strr[self.i] == ' ':
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			self.i+=1
 			self.condition="start"
+			self.endStatus = True
 			self.obligatory = False
 			if self.numbers.count(self.entryString)==0:
 				self.numbers.append(self.entryString)
@@ -306,11 +314,11 @@ class LA:
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.isLastWord = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.numbers.count(self.entryString)==0:
 				self.numbers.append(self.entryString)
 				self.uiclass.text2.insert( END, self.numbers[-1]+ " ")
-			self.endStatus = True
 			self.entryString = ""
 		elif (self.strr[self.i]=="1"):
 			self.i+=1
@@ -326,7 +334,8 @@ class LA:
 			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
 			self.i+=1
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
+			self.endStatus = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
 			if self.words.count(self.entryString)==0:
 				self.words.append(self.entryString)
 				self.uiclass.text4.insert( END, self.words[-1]+" ")
@@ -339,12 +348,12 @@ class LA:
 			return
 		self.entryString += self.strr[self.i]
 		if( (self.i + 1) == len(self.strr)):
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.isLastWord = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.words.count(self.entryString)==0:
 				self.words.append(self.entryString)
 				self.uiclass.text4.insert( END, self.words[-1]+" ")
 			self.entryString = ""
-			self.endStatus = True
 			return
 		elif (self.strr[self.i] in "acd"):
 			self.i+=1
@@ -362,7 +371,8 @@ class LA:
 		if (self.strr[self.i] in "abcd"):
 			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
+			self.endStatus = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
 			if self.words.count(self.entryString)==0:
 				self.words.append(self.entryString)
 				self.uiclass.text4.insert( END, self.words[-1]+" ")
@@ -380,15 +390,16 @@ class LA:
 			self.skip("error")
 			return
 		if( (self.i + 1) == len(self.strr)):
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.isLastWord = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.words.count(self.entryString)==0:
 				self.words.append(self.entryString)
 				self.uiclass.text4.insert( END, self.words[-1]+" ")
 			self.entryString = ""
-			self.endStatus = True
 			return
 		elif self.strr[self.i+1] == ' ':
-			self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+			self.endStatus = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
 			if self.words.count(self.entryString)==0:
 				self.words.append(self.entryString)
 				self.uiclass.text4.insert( END, self.words[-1]+ " ")
@@ -400,3 +411,51 @@ class LA:
 			self.i+=1
 			self.where = "A_letter()"
 			return
+
+	def SA(self):
+		self.localType = ""
+		self.localString = ""
+		self.SAcond = "start"
+		self.squarePnumber = 0
+		self.numberNumberLUL = 0
+
+		self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+		if self.localType != " буквы ":
+			self.uiclass.entry1.insert(0 , "Ошибка")
+		else:
+			while(self.localLastWordStatus != True):
+				if self.SAcond == "start":
+					self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+					self.SA_A()
+				else:
+					if self.SAwhere == "SA_A":
+						self.SA_A()
+					if self.SAwhere == "SA_B":
+						self.SA_B()
+			else:
+				self.uiclass.entry1.insert(0 , "Все в порядке")
+
+	def SA_A(self):
+		self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+		if self.localType == "[":
+			self.squarePnumber +=1
+			self.SAwhere = "SA_A"
+			return
+		elif self.localType == "]":
+			if self.squarePnumber > 0:
+				self.squarePnumber -= 1
+				self.SAwhere = "SA_A"
+			else:
+				self.skip("error")
+		elif self.localType == " цифры ":
+			self.numberNumberLUL +=1
+			if self.numberNumberLUL == 1:
+				self.SAwhere = "SA_A"
+			elif self.numberNumberLUL == 2:
+				self.SAwhere = "SA_B"
+	def SA_B(self):
+		self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+		if self.localType == " буквы ":
+			self.SAwhere = "SA_B"
+		else:
+			self.skip("error")

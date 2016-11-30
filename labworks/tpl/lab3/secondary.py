@@ -1,5 +1,5 @@
 from tkinter import *
-from enum import Enum
+
 class UI:
 	def __init__(self,x):
 		self.textWidth = 20

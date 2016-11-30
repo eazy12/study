@@ -1,11 +1,8 @@
 import socket
 import random
 import os
-import sys
 import subprocess
-import traceback
 import time
-b = False
 questions = [
     ["Дата создания с++","1950","1960","1970","1980"],
     ["Дата создания java","1950","1960","1970","1980"],
@@ -13,22 +10,24 @@ questions = [
     ["Дата создания javascript","1950","1960","1970","1980"],
     ["Дата создания Lua","1950","1960","1970","1980"]
 ]
+random.shuffle(questions)
 os.system("touch pyt.py")
 f = open('pyt.py', 'w')
-random.shuffle(questions)
 
 sock = socket.socket()
-sock.bind(('', 9080))
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(('', 9081))
 sock.listen(1)
 conn, addr = sock.accept()
+
 try:
     print('connected:', addr)
 
     data = conn.recv(1024)
     i=0
+
     if data.decode('utf-8') == "Готов":
         while(i<1):
-            #conn.send(bytes(questions[i][0],encoding = 'utf-8'))
             for k in range(0,5):
                 conn.send(bytes(questions[i][k],encoding = 'utf-8'))
                 time.sleep(0.3)
@@ -43,34 +42,22 @@ try:
             f.write(program)
             f.close()
             process = subprocess.check_output("python3 pyt.py", stderr = subprocess.STDOUT, shell=True)
+            process = process[:-1]
             print(process)
             #conn.send(bytes(process, encoding = 'utf-8'))
             conn.send(process)
     else:
         pass
-    if b == False:
-        conn.close()
-        b = True
+    conn.close()
 except KeyboardInterrupt:
     print("Error ctrl+с")
-    if b == False:
-        conn.close()
-        b = True
+    conn.close()
 except subprocess.CalledProcessError as err:
     print(err.output)
     conn.send(err.output)
-    if b == False:
-        conn.close()
-        b = True
-    #print(err.cmd)
-    #print(sys.stderr)
+    conn.close()
 except:
     print("except block")
-    if b == False:
-        conn.close()
-        b = True
-    os.system("rm pyt.py")
+    conn.close()
 finally:
-    if b == False:
-        conn.close()
-        b = True
+    conn.close()
