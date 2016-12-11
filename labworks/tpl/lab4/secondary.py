@@ -39,12 +39,6 @@ class LA:
 	def set_ui(self,x):
 		self.uiclass = x
 	def lex_anal(self):
-		self.numbers = []
-		self.sysSymbols = []
-		self.words = []
-		self.uiclass.text2.delete(1.0,END)
-		self.uiclass.text3.delete(1.0,END)
-		self.uiclass.text4.delete(1.0,END)
 		#self.i = 0
 		self.strr=""
 		self.uiclass.entry1.delete(0, END)
@@ -71,7 +65,7 @@ class LA:
 		#self.strr = self.strr[:-1]
 		print(self.strr)
 		while(self.i < len(self.strr)):
-			if (self.endStatus == False):
+			if (self.endStatus == False and self.isLastWord == False ):
 				if (self.condition == "start"):
 					self.condition = "continue"
 					if (self.strr[self.i] in "01"):
@@ -88,14 +82,14 @@ class LA:
 					elif self.strr[self.i] in "[]":
 						if self.sysSymbols.count(self.strr[self.i])==0:
 							self.sysSymbols.append(self.strr[self.i])
-						self.uiclass.text3.insert( END, self.sysSymbols[-1]+" ")
+							self.uiclass.text3.insert( END, self.sysSymbols[-1]+" ")
 						print("End")
 						self.endStatus = False
 						self.condition = "start"
-						self.strr=""
 						self.entryString = ""
-						print(self.strr[self.i], self.strr[self.i] , self.isLastWord)
-						return self.strr[self.i], self.strr[self.i] , self.isLastWord
+						self.i +=1
+						print(self.strr[self.i-1], self.strr[self.i-1] , self.isLastWord)
+						return self.strr[self.i-1], self.strr[self.i-1] , self.isLastWord
 					else:
 						print("Error in begin")
 						self.entryString += self.strr[self.i]
@@ -333,6 +327,16 @@ class LA:
 		if (self.strr[self.i] in "abcd"):
 			self.type1 = " буквы "
 		elif self.strr[self.i] == ' ':
+			if( (self.i + 1) == len(self.strr)):
+				self.isLastWord = True
+			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + self.type1)
+				if self.words.count(self.entryString)==0:
+					self.words.append(self.entryString)
+					self.uiclass.text4.insert( END, self.words[-1]+" ")
+				self.entryString = ""
+				print (self.words)
+				return
+		
 			self.i+=1
 			self.endStatus = True
 			#self.uiclass.entry1.insert(len(self.uiclass.entry1.get()) , self.entryString + ' ' + " буквы ")
@@ -341,6 +345,7 @@ class LA:
 				self.uiclass.text4.insert( END, self.words[-1]+" ")
 			self.condition="start"
 			self.entryString =""
+			print (self.words)
 			return
 		else:
 			print("Lexical error: A_letter")
@@ -355,7 +360,7 @@ class LA:
 				self.uiclass.text4.insert( END, self.words[-1]+" ")
 			self.entryString = ""
 			return
-		elif (self.strr[self.i] in "acd"):
+		if (self.strr[self.i] in "acd"):
 			self.i+=1
 			self.where = "A_letter()"
 			return
@@ -413,19 +418,27 @@ class LA:
 			return
 
 	def SA(self):
+		self.uiclass.text2.delete(1.0,END)
+		self.uiclass.text3.delete(1.0,END)
+		self.uiclass.text4.delete(1.0,END)
 		self.localType = ""
 		self.localString = ""
 		self.SAcond = "start"
 		self.squarePnumber = 0
 		self.numberNumberLUL = 0
+		self.numbers = []
+		self.sysSymbols = []
+		self.words = []
+		
 
-		self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+		( self.localString, self.localType, self.localLastWordStatus ) = self.lex_anal()
 		if self.localType != " буквы ":
 			self.uiclass.entry1.insert(0 , "Ошибка")
 		else:
 			while(self.localLastWordStatus != True):
 				if self.SAcond == "start":
-					self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+					(self.localString, self.localType, self.localLastWordStatus) = self.lex_anal()
+					self.SAcond = "not start"
 					self.SA_A()
 				else:
 					if self.SAwhere == "SA_A":
@@ -434,16 +447,27 @@ class LA:
 						self.SA_B()
 			else:
 				self.uiclass.entry1.insert(0 , "Все в порядке")
+		
+		self.strr = ""
+		self.i = 0
+		self.isLastWord = False
+		self.endStatus = False
 
 	def SA_A(self):
-		self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+		(self.localString, self.localType, self.localLastWordStatus) = self.lex_anal()
 		if self.localType == "[":
 			self.squarePnumber +=1
 			self.SAwhere = "SA_A"
 			return
 		elif self.localType == "]":
 			if self.squarePnumber > 0:
-				self.squarePnumber -= 1
+				self.squarePnumber -= 1 
+				while self.squarePnumber > 0:
+					(self.localString, self.localType, self.localLastWordStatus) = self.lex_anal()
+					if self.localType == "]":
+						self.squarePnumber -= 1
+					else:
+						self.skip("error")
 				self.SAwhere = "SA_A"
 			else:
 				self.skip("error")
@@ -453,8 +477,10 @@ class LA:
 				self.SAwhere = "SA_A"
 			elif self.numberNumberLUL == 2:
 				self.SAwhere = "SA_B"
+		elif self.localType not in [" цифры ", "[" , "]"]:
+			self.skip("error")
 	def SA_B(self):
-		self.localString, self.localType, self.localLastWordStatus = self.lex_anal()
+		(self.localString, self.localType, self.localLastWordStatus) = self.lex_anal()
 		if self.localType == " буквы ":
 			self.SAwhere = "SA_B"
 		else:
