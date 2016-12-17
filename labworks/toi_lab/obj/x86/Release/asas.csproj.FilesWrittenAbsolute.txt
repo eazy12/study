@@ -1,0 +1,7 @@
+/home/eazy12/coding_stuff/asas/obj/x86/Release/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/eazy12/coding_stuff/asas/obj/x86/Release/asas.gtk-gui.gui.stetic
+/home/eazy12/coding_stuff/asas/bin/Release/Npgsql.dll
+/home/eazy12/coding_stuff/asas/bin/Release/asas.exe.mdb
+/home/eazy12/coding_stuff/asas/bin/Release/asas.exe
+/home/eazy12/coding_stuff/asas/obj/x86/Release/asas.exe
+/home/eazy12/coding_stuff/asas/obj/x86/Release/asas.exe.mdb
