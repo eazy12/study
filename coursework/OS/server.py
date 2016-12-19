@@ -1,53 +1,70 @@
+# сокеты
 import socket
-import random
+#работа с ОС. Используется для создания файла
 import os
+# Для выдачи ошибок
 import subprocess
+# Для задежки
 import time
-questions = [
-    ["Дата создания с++","1950","1960","1970","1980"],
-    ["Дата создания java","1950","1960","1970","1980"],
-    ["Дата создания python","1950","1960","1970","1980"],
-    ["Дата создания javascript","1950","1960","1970","1980"],
-    ["Дата создания Lua","1950","1960","1970","1980"]
-]
-random.shuffle(questions)
+# Работа с бд
+import sqlite3
+# Сериализация
+import pickle
+
+connection2db = sqlite3.connect('database.db')
+cursor = connection2db.cursor()
 os.system("touch pyt.py")
 f = open('pyt.py', 'w')
 
 sock = socket.socket()
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-sock.bind(('', 9081))
+sock.bind(('', 9082))
 sock.listen(1)
 conn, addr = sock.accept()
 
 try:
     print('connected:', addr)
+    b = False
 
-    data = conn.recv(1024)
-    i=0
+    while( b!=True):
+        login = conn.recv(1024).decode('utf-8')
+        password = conn.recv(1024).decode('utf-8')
 
-    if data.decode('utf-8') == "Готов":
-        while(i<1):
-            for k in range(0,5):
-                conn.send(bytes(questions[i][k],encoding = 'utf-8'))
-                time.sleep(0.3)
-            answer = conn.recv(1024)
-            answer = answer.decode('utf-8')
-            print(answer)
-            i=i+1
+        cursor.execute('select password, whoIsIt from users where secondName =?', (login,))
+        queryResult = cursor.fetchall()
+
+        if queryResult == []:
+            conn.send(bytes('Неверный логин',encoding = 'utf-8'))
+        elif(password != queryResult[0][0]):
+            conn.send(bytes('Неверный пароль',encoding = 'utf-8'))
         else:
-            conn.send(bytes("LUL",encoding = 'utf-8'))
-            program = conn.recv(1024)
-            program = program.decode('utf-8')
-            f.write(program)
-            f.close()
-            process = subprocess.check_output("python3 pyt.py", stderr = subprocess.STDOUT, shell=True)
-            process = process[:-1]
-            print(process)
-            #conn.send(bytes(process, encoding = 'utf-8'))
-            conn.send(process)
-    else:
+            conn.send(bytes('Верный пароль',encoding = 'utf-8'))
+            b = True
+
+    workType = conn.recv(1024).decode('utf-8')
+
+    if workType == "test":
+        cursor.execute('SELECT * FROM questions WHERE question IN (SELECT question FROM questions ORDER BY RANDOM() LIMIT 5)')
+        connection2db.commit()
+
+        aaa = cursor.fetchall()
+        print(cursor)
+        cursor1 = pickle.dumps(aaa)
+        conn.send(cursor1)
+
+        qqq = conn.recv(4096)
+        aaaa = pickle.loads(qqq)
+        print(aaaa)
+        Ocenka =0
+        for i in aaaa:
+            if i == 1:
+                Ocenka+=1
+        print(Ocenka)
+    elif workType == "labwork":
         pass
+    else:
+        print("error argument")
+
     conn.close()
 except KeyboardInterrupt:
     print("Error ctrl+с")
@@ -56,8 +73,8 @@ except subprocess.CalledProcessError as err:
     print(err.output)
     conn.send(err.output)
     conn.close()
-except:
-    print("except block")
-    conn.close()
+# except:
+#     print("except block")
+#     conn.close()
 finally:
     conn.close()
