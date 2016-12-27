@@ -1,28 +1,29 @@
-# todo:
+# работа с сокетами
 import socket
+# для задержки
 import time
+# сериализация
 import pickle
-#import sqlite3
-
+# массивы
 import numpy as np
+# GUI
 from tkinter import *
 
 class CClient:
     def __init__(self):
+        # окно входа
         self.b=True
         self.answers = np.zeros([5])
         self.root=Tk()
         self.errorString = StringVar()
         self.errorString.set(' ')
-        #self.root1 = Tk()
-        #self.root1.withdraw()
         self.root.resizable(width=False, height=False)
         self.root.geometry("500x500")
-        #self.root1.geometry("500x500")
 
         self.labelText = StringVar()
         self.labelText.set("Нажмите Готов")
 
+        # создаем виджеты
         self.label0_0=Label(self.root, text="Здраствуйте", font='DroidSans 14 bold ')
         self.label0_1=Label(self.root, text="Логин", font='DroidSans 14 bold italic')
         self.label0_2=Label(self.root, text="Пароль", font='DroidSans 14 bold italic')
@@ -33,7 +34,7 @@ class CClient:
         self.entry0_0 = Entry(self.root, width= 15, font='DroidSans 14 bold italic')
         self.entry0_1 = Entry(self.root, width= 15, font='DroidSans 14 bold italic')
 
-
+        # размещаем виджеты
         self.label0_0.place(x=130,y=160)
         self.label0_1.place(x=80,y=185)
         self.label0_2.place(x=80,y=210)
@@ -44,18 +45,20 @@ class CClient:
 
         self.label0_3.place_forget()
 
-
-
+        # подключение через сокет
         self.sock = socket.socket()
-        self.sock.connect(('localhost', 9082))
-
-
+        self.sock.connect(('localhost', 9079))
 
     def button0Command(self):
+        # проверяем логин и пароли
+        if( self.entry0_0.get() == "" or self.entry0_1.get()==""):
+            self.errorString.set("Пропущено поле")
+            self.label0_3.place(x=85,y=270)
+            return
         self.sock.send(bytes(self.entry0_0.get(),encoding = 'utf-8'))
-        time.sleep(0.3)
+        time.sleep(0.1)
         self.sock.send(bytes(self.entry0_1.get(),encoding = 'utf-8'))
-        time.sleep(0.3)
+        time.sleep(0.1)
         z = self.sock.recv(1024).decode('utf-8')
 
         if(z=='Неверный логин'):
@@ -69,6 +72,7 @@ class CClient:
             print(z)
             return
 
+        # переход на следующее окно
         self.root1 = Tk()
         self.root1.geometry("500x500")
         self.label1_0=Label(self.root1, text="Итоговый тест", font='DroidSans 14 bold italic')
@@ -82,31 +86,31 @@ class CClient:
 
         self.label1_0.place(x = 40, y = 120)
         self.label1_1.place(x = 40, y = 200)
-
+        self.root1.protocol("WM_DELETE_WINDOW", self.close )
         self.root.destroy()
         self.root1.mainloop()
 
+    def close(self):
+        # посылем на сервер сообщение о закрытии
+        self.sock.send(bytes("end",encoding = 'utf-8'))
+        self.root1.destroy()
+
     def selected(self, x,y):
-        print( self.queryResult[x][5], type(self.queryResult[x][5]) )
-        print(y.get(), type(y.get()), len((y.get()) ))
+        # записываем ответы студента в массив
         if str(self.queryResult[x][5]) == y.get():
-            print("Kappa")
             self.answers[x] = True
         else:
-            print("LUL")
             self.answers[x] = False
-        print(self.answers)
 
 
     def button1Command(self):
+        # окно теста
         self.sock.send(bytes("test",encoding = 'utf-8'))
         self.root1.withdraw()
         self.root2 = Tk()
 
         self.smt = self.sock.recv(4096)
         self.queryResult = pickle.loads(self.smt)
-
-        print(self.queryResult)
 
         question1 = StringVar()
         question1.set(self.queryResult[0][0])
@@ -180,77 +184,61 @@ class CClient:
 
         self.button2_0.pack()
         self.root2.mainloop()
+
+    def button4Command(self):
+        #окно после теста
+        self.root3 = Tk()
+        self.root3.geometry("500x500")
+        quq = pickle.dumps(self.answers)
+        self.sock.send(quq)
+        r = self.sock.recv(1024).decode('utf-8')
+        self.button3_0=Button(self.root3,text="В главное меню", command=self.button5Command)
+        self.label3_0=Label(self.root3, text=("Оценка: "+r), font='DroidSans 14 bold ')
+        self.button3_0.place(x=150,y = 180)
+        self.label3_0.place(x=160,y = 150)
+        self.root2.destroy()
+        self.root3.mainloop()
+
+    def button5Command(self):
+        # выход в главное меню
+        self.root1.deiconify()ы
+        self.root3.destroy()
+
     def button2Command(self):
-        #labwork
+        # окно лабы
+        self.sock.send(bytes("labwork",encoding = 'utf-8'))
         self.root1.withdraw()
         self.root2 = Tk()
         self.root2.geometry("500x500")
         self.root2.protocol("WM_DELETE_WINDOW", self.button3Command)
+        self.text2 = Text(self.root2, height = 20, width = 55, font='DroidSans 10 italic', pady=10)
+        self.text3 = Text(self.root2, height = 7, width = 55, font='DroidSans 10 italic')
         self.button2_0=Button(self.root2,text="Назад", command=self.button3Command)
-        self.button2_0.pack()
+        self.button3_0=Button(self.root2,text="Проверить", command=self.proverka)
+        self.text2.grid(row=0, column=1, pady=(10, 10),padx=(60,0))
+        self.text3.grid(row=1, column=1, pady=(0, 10),padx=(60,0))
+        self.button2_0.grid(row=2, column=1, pady=(0, 10),padx=(60,0))
+        self.button3_0.grid(row=3, column=1, pady=(0, 10),padx=(60,0))
         self.root2.mainloop()
-    def button3Command(self):
-        self.root1.deiconify()
-        self.root2.destroy()
-    def button4Command(self):
-        self.root3 = Tk()
-        self.root3.geometry("500x500")
-        self.button3_0=Button(self.root3,text="В главное меню", command=self.button5Command)
-        self.button3_0.pack(anchor=W)
-        quq = pickle.dumps(self.answers)
+    def proverka(self):
+        # кнопка проверки программы. Программа запускает на сервере
+        quq = pickle.dumps(self.text2.get("1.0",END))
         self.sock.send(quq)
-        self.root2.destroy()
-        self.root3.mainloop()
-    def button5Command(self):
+        time.sleep(0.1)
+        qqq = self.sock.recv(4096)
+        print("qqq, ",qqq.decode('utf-8'))
+        self.text3.delete(1.0, END)
+        self.text3.insert(1.0, qqq.decode('utf-8'))
+
+    def button3Command(self):
+        # выход из окна лабы
+        z = "endd"
+        quq = pickle.dumps(z)
+        self.sock.send(quq)
         self.root1.deiconify()
-        self.root3.destroy()
+        self.root2.destroy()
 
-    def stuff(self):
-        try:
-            s = input()
-            sock.send(bytes(s,encoding = 'utf-8'))
-
-            while(True):
-                data = sock.recv(1024)
-                data = data.decode('utf-8')
-                if data == "LUL":
-                    break
-                print(data)
-
-                data = sock.recv(1024)
-                data = data.decode('utf-8')
-                print(data)
-
-                data = sock.recv(1024)
-                data = data.decode('utf-8')
-                print(data)
-
-                data = sock.recv(1024)
-                data = data.decode('utf-8')
-                print(data)
-
-                data = sock.recv(1024)
-                data = data.decode('utf-8')
-                print(data)
-
-                rr = input()
-                sock.send(bytes(rr,encoding = 'utf-8'))
-
-            print("Введите программу HelloWorld на python")
-            kek = input()
-            sock.send(bytes(kek,encoding = 'utf-8'))
-            result = sock.recv(1024)
-            result = result.decode('utf-8')
-            print("************ Результат выполнения программы ************")
-            print(result)
-            print("************ Результат выполнения программы ************")
-            print("Тест закончен")
-        except KeyboardInterrupt:
-            print("Error ctrl+z")
-            sock.close()
-        finally:
-            print("End")
-            sock.close()
-
+# создание класса
 ui = CClient()
+# запуска окна
 ui.root.mainloop()

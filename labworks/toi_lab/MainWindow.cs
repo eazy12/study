@@ -9,7 +9,7 @@ namespace labwork
 {
 public partial class MainWindow: Gtk.Window
 	{
-		DB_stuff dbstuff = new DB_stuff("Server=127.0.0.1;Port=5432;User Id=just_user;Password=QWERTY;Database=just_test;");
+		DB_stuff dbstuff = new DB_stuff("Server=localhost;Port=5432;User Id=just_user;Password=QWERTY;Database=just_test;");
 
 		public MainWindow () : base (Gtk.WindowType.Toplevel)
 		{
@@ -28,7 +28,7 @@ public partial class MainWindow: Gtk.Window
 		{
 			try
 			{
-				dbstuff.setCommand = "Select password From tech_stuff WHERE login ='" + entry1.Text + "'" ;
+				dbstuff.setCommand = "Select password From users WHERE login ='" + entry1.Text + "'" ;
 				NpgsqlDataReader reader1;
 
 				dbstuff.conn.Open();

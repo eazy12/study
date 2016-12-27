@@ -69,6 +69,12 @@
     <Compile Include="SecondWindow.cs" />
     <Compile Include="gtk-gui\labwork.MainWindow.cs" />
     <Compile Include="gtk-gui\labwork.SecondWindow.cs" />
+    <Compile Include="addElement.cs" />
+    <Compile Include="gtk-gui\labwork.addElement.cs" />
+    <Compile Include="deleteElement.cs" />
+    <Compile Include="gtk-gui\labwork.deleteElement.cs" />
+    <Compile Include="cmdWindow.cs" />
+    <Compile Include="gtk-gui\labwork.cmdWindow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -11,9 +11,7 @@ namespace labwork
 			base (Gtk.WindowType.Toplevel)
 		{
 			this.Build ();
-			label4.Text = "Введите команду на языке SQL";
-			textview2.Editable = false;
-			label5.Text = "Результат выполнения команды";
+
 		}
 
 		protected void OnButton5Clicked (object sender, EventArgs e)
@@ -33,31 +31,22 @@ namespace labwork
 		{
 			try
 			{
-				textview2.Buffer.Text ="";
-				if(textview1.Buffer.Text == "/help")
-				{
-					textview2.Buffer.Text = " BEGIN;\n"+"" +
-											"UPDATE accounts SET balance = balance - 100.00 WHERE name = 'Alice'; \n" +
-											"DELETE FROM accounts WHERE login = 'sadasd';\n"+
-											"INSERT INTO account VALUES ('id','fio','permis');"+
-											"\n-- и т.д. ....\nCOMMIT;";
-					return;
-				}
+				
 				NpgsqlDataReader reader2;
-				dbstuff.setCommand = textview1.Buffer.Text ;
+				//dbstuff.setCommand = textview1.Buffer.Text ;
 
 				dbstuff.conn.Open();
 				reader2 =  dbstuff.comm.ExecuteReader();
 
 
-				while(reader2.Read())
+				/*while(reader2.Read())
 				{	
 					for( int i=0; i < reader2.FieldCount; i++)
 					{
 						textview2.Buffer.Text += reader2.GetString(i) + "\t";
 					}
 					textview2.Buffer.Text += "\n";
-				}
+				}*/
 				dbstuff.conn.Close();
 			}
 			catch 
@@ -77,6 +66,27 @@ namespace labwork
 		{
 			Application.Quit ();
 			a.RetVal = true;
+		}
+	
+		protected void OnButton14Clicked (object sender, EventArgs e)
+		{
+			addElement win3 = new addElement();
+			win3.Show ();
+			this.Destroy();
+		}
+
+		protected void OnButton15Clicked (object sender, EventArgs e)
+		{
+			deleteElement win3 = new deleteElement();
+			win3.Show ();
+			this.Destroy();
+		}
+
+		protected void OnButton16Clicked (object sender, EventArgs e)
+		{
+			cmdWindow win3 = new cmdWindow();
+			win3.Show ();
+			this.Destroy();
 		}
 	}
 }

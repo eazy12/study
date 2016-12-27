@@ -1,12 +1,13 @@
 ﻿<Properties StartupItem="asas.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="MainWindow.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="addElement.cs">
     <Files>
       <File FileName="Program.cs" Line="1" Column="1" />
-      <File FileName="MainWindow.cs" Line="12" Column="117" />
-      <File FileName="DataStuff.cs" Line="32" Column="3" />
-      <File FileName="packages.config" Line="1" Column="1" />
-      <File FileName="SecondWindow.cs" Line="38" Column="6" />
+      <File FileName="MainWindow.cs" Line="48" Column="21" />
+      <File FileName="DataStuff.cs" Line="1" Column="1" />
+      <File FileName="SecondWindow.cs" Line="75" Column="19" />
+      <File FileName="addElement.cs" Line="29" Column="6" />
+      <File FileName="gtk-gui/labwork.SecondWindow.cs" Line="136" Column="80" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

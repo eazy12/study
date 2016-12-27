@@ -59,6 +59,8 @@ namespace labwork
 			this.Name = "labwork.MainWindow";
 			this.Title = global::Mono.Unix.Catalog.GetString ("MainWindow");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
+			this.DefaultWidth = 750;
+			this.DefaultHeight = 750;
 			// Container child labwork.MainWindow.Gtk.Container+ContainerChild
 			this.vbox3 = new global::Gtk.VBox ();
 			this.vbox3.Name = "vbox3";
@@ -153,7 +155,6 @@ namespace labwork
 			w10.Fill = false;
 			// Container child vbox4.Gtk.Box+BoxChild
 			this.hbox2 = new global::Gtk.HBox ();
-			this.hbox2.Name = "hbox2";
 			this.hbox2.Spacing = 6;
 			// Container child hbox2.Gtk.Box+BoxChild
 			this.fixed15 = new global::Gtk.Fixed ();
@@ -261,8 +262,6 @@ namespace labwork
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 417;
-			this.DefaultHeight = 387;
 			this.label1.Hide ();
 			this.Show ();
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
